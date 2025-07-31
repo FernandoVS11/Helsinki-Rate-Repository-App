@@ -4,6 +4,10 @@ import Constants from 'expo-constants';
 import { Link } from 'react-router-native';
 import Text from './Text';
 import PropTypes from 'prop-types';
+import { useApolloClient, useQuery } from '@apollo/client';
+import { ME } from '../graphql/queries';
+import AuthStorage from '../utils/authStorage';
+import { useNavigate } from 'react-router-native';
 const styles = StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight,
@@ -31,11 +35,29 @@ const AppBarTab = ({ to, children }) => (
 );
 
 const AppBar = () => {
+  const { data } = useQuery(ME);
+  const apolloClient = useApolloClient();
+  const authStorage = new AuthStorage();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await authStorage.removeAccessToken();
+    await apolloClient.resetStore();
+    navigate('/signin');
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView horizontal contentContainerStyle={styles.scroll}>
         <AppBarTab to="/">Repositories</AppBarTab>
-        <AppBarTab to="/signin">Sign In</AppBarTab>
+
+        {data?.me ? (
+          <TouchableWithoutFeedback onPress={handleSignOut}>
+            <Text style={styles.tabText}>Sign out</Text>
+          </TouchableWithoutFeedback>
+        ) : (
+          <AppBarTab to="/signin">Sign in</AppBarTab>
+        )}
       </ScrollView>
     </View>
   );

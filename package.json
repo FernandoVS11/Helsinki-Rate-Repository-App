@@ -11,18 +11,18 @@
     "lint": "eslint ./src/**/*.{js,jsx} App.js --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "expo": "^53.0.20",
-    "expo-status-bar": "^1.0.2",
-    "module": "^1.1.0",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "expo": "~53.0.0",
+    "expo-status-bar": "~1.8.0",
     "prop-types": "^15.8.1",
-    "react": "~16.11.0",
-    "react-dom": "~16.11.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz",
-    "react-native-web": "^0.21.0"
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.73.5",
+    "react-native-web": "~0.21.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.6",
-    "babel-preset-expo": "~8.1.0"
+    "@babel/core": "^7.20.0",
+    "babel-preset-expo": "^9.6.0"
   },
   "private": true
 }
