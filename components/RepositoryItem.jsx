@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import PropTypes from 'prop-types';
-import formatThousands from '../utils/formatThousands';
+import { View, StyleSheet, Image, Pressable, Text as NativeText } from 'react-native';
+import theme from '../theme';
+import Text from './Text';
 
 const styles = StyleSheet.create({
   container: {
     padding: 15,
     backgroundColor: 'white',
   },
-  topSection: {
+  header: {
     flexDirection: 'row',
     marginBottom: 10,
   },
@@ -19,25 +19,17 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   info: {
-    flexShrink: 1,
+    flex: 1,
   },
-  fullName: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  description: {
-    marginBottom: 4,
-    color: '#586069',
-  },
-  language: {
-    backgroundColor: '#0366d6',
-    color: 'white',
+  languageTag: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
+    backgroundColor: theme.colors.primary,
+    color: 'white',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 4,
     overflow: 'hidden',
+    marginTop: 5,
   },
   stats: {
     flexDirection: 'row',
@@ -46,55 +38,59 @@ const styles = StyleSheet.create({
   statItem: {
     alignItems: 'center',
   },
-  statLabel: {
-    color: '#586069',
+  button: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
-const RepositoryItem = ({ item }) => {
+const formatThousands = (value) => {
+  return value >= 1000 ? `${Math.round(value / 100) / 10}k` : String(value);
+};
+
+const RepositoryItem = ({ item, showGithubButton = false, onPressGithub }) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.topSection}>
+    <View testID="repositoryItem" style={styles.container}>
+      <View style={styles.header}>
         <Image style={styles.avatar} source={{ uri: item.ownerAvatarUrl }} />
         <View style={styles.info}>
-          <Text style={styles.fullName}>{item.fullName}</Text>
-          <Text style={styles.description}>{item.description}</Text>
-          <Text style={styles.language}>{item.language}</Text>
+          <Text fontWeight="bold">{item.fullName}</Text>
+          <Text color="textSecondary">{item.description}</Text>
+          <Text style={styles.languageTag}>{item.language}</Text>
         </View>
       </View>
       <View style={styles.stats}>
         <View style={styles.statItem}>
-          <Text>{formatThousands(item.stargazersCount)}</Text>
-          <Text style={styles.statLabel}>Stars</Text>
+          <Text fontWeight="bold">{formatThousands(item.stargazersCount)}</Text>
+          <Text color="textSecondary">Stars</Text>
         </View>
         <View style={styles.statItem}>
-          <Text>{formatThousands(item.forksCount)}</Text>
-          <Text style={styles.statLabel}>Forks</Text>
+          <Text fontWeight="bold">{formatThousands(item.forksCount)}</Text>
+          <Text color="textSecondary">Forks</Text>
         </View>
         <View style={styles.statItem}>
-          <Text>{item.reviewCount}</Text>
-          <Text style={styles.statLabel}>Reviews</Text>
+          <Text fontWeight="bold">{item.reviewCount}</Text>
+          <Text color="textSecondary">Reviews</Text>
         </View>
         <View style={styles.statItem}>
-          <Text>{item.ratingAverage}</Text>
-          <Text style={styles.statLabel}>Rating</Text>
+          <Text fontWeight="bold">{item.ratingAverage}</Text>
+          <Text color="textSecondary">Rating</Text>
         </View>
       </View>
+      {showGithubButton && (
+        <Pressable style={styles.button} onPress={onPressGithub}>
+          <NativeText style={styles.buttonText}>Open in GitHub</NativeText>
+        </Pressable>
+      )}
     </View>
   );
-};
-
-RepositoryItem.propTypes = {
-  item: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    language: PropTypes.string.isRequired,
-    forksCount: PropTypes.number.isRequired,
-    stargazersCount: PropTypes.number.isRequired,
-    reviewCount: PropTypes.number.isRequired,
-    ratingAverage: PropTypes.number.isRequired,
-    ownerAvatarUrl: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default RepositoryItem;

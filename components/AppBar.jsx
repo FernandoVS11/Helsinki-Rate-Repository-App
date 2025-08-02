@@ -1,70 +1,70 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import Constants from 'expo-constants';
+import { StyleSheet, View, ScrollView, Pressable, Text } from 'react-native';
 import { Link } from 'react-router-native';
-import Text from './Text';
-import PropTypes from 'prop-types';
 import { useApolloClient, useQuery } from '@apollo/client';
 import { ME } from '../graphql/queries';
-import AuthStorage from '../utils/authStorage';
-import { useNavigate } from 'react-router-native';
+import useAuthStorage from '../hooks/useAuthStorage';
+
 const styles = StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#24292e',
-    paddingBottom: 15,
-    paddingLeft: 10,
-  },
-  scroll: {
     flexDirection: 'row',
   },
   tab: {
-    marginRight: 20,
+    padding: 15,
   },
   tabText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
   },
 });
 
-const AppBarTab = ({ to, children }) => (
-  <Link to={to} component={TouchableWithoutFeedback} style={styles.tab}>
-    <Text style={styles.tabText}>{children}</Text>
-  </Link>
-);
+const AppBarTab = ({ to, children, onPress }) => {
+  return (
+    <Pressable onPress={onPress}>
+      <View style={styles.tab}>
+        {to ? (
+          <Link to={to}>
+            <Text style={styles.tabText}>{children}</Text>
+          </Link>
+        ) : (
+          <Text style={styles.tabText}>{children}</Text>
+        )}
+      </View>
+    </Pressable>
+  );
+};
 
 const AppBar = () => {
   const { data } = useQuery(ME);
   const apolloClient = useApolloClient();
-  const authStorage = new AuthStorage();
-  const navigate = useNavigate();
+  const authStorage = useAuthStorage();
 
   const handleSignOut = async () => {
     await authStorage.removeAccessToken();
     await apolloClient.resetStore();
-    navigate('/signin');
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal contentContainerStyle={styles.scroll}>
+      <ScrollView horizontal>
         <AppBarTab to="/">Repositories</AppBarTab>
-
         {data?.me ? (
-          <TouchableWithoutFeedback onPress={handleSignOut}>
-            <Text style={styles.tabText}>Sign out</Text>
-          </TouchableWithoutFeedback>
+          <>
+            <AppBarTab to="/create-review">Create a review</AppBarTab>
+            <AppBarTab onPress={handleSignOut}>Sign out</AppBarTab>
+          </>
         ) : (
-          <AppBarTab to="/signin">Sign in</AppBarTab>
+          <>
+            <AppBarTab to="/signin">Sign in</AppBarTab>
+            <AppBarTab to="/signup">Sign up</AppBarTab>
+          </>
         )}
       </ScrollView>
     </View>
   );
 };
 
-AppBarTab.propTypes = {
-  to: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-};
 export default AppBar;
